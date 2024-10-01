@@ -22,15 +22,31 @@ export async function POST(request) {
     4. Green transportation suggestions
     5. Tips for minimizing environmental impact
 
-    Format the itinerary in a clear, easy-to-read structure.`;
+    Format the response as a JSON object with the following structure:
+    {
+      "overview": "A brief overview of the trip",
+      "days": [
+        {
+          "day": 1,
+          "activities": [
+            "Activity 1",
+            "Activity 2",
+            "Activity 3"
+          ]
+        },
+        // ... more days
+      ]
+    }
+
+    Ensure the output is a valid JSON object without any additional text or formatting.`;
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const itinerary = response.text();
+    const itineraryJson = JSON.parse(response.text());
 
-    return new Response(JSON.stringify({ itinerary }), {
+    return new Response(JSON.stringify(itineraryJson), {
       headers: { 'Content-Type': 'application/json' },
       status: 200,
     });

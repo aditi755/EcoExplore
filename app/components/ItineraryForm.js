@@ -32,7 +32,7 @@ export default function ItineraryForm() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-      setItinerary(data.itinerary);
+      setItinerary(data);
     } catch (error) {
       console.error('Error generating itinerary:', error);
     }
@@ -131,8 +131,20 @@ export default function ItineraryForm() {
       </form>
       {itinerary && (
         <div className="mt-8">
-          <h3 className="text-lg font-bold mb-2 text-black">Your Sustainable Itinerary:</h3>
-          <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded text-black">{itinerary}</pre>
+          <h3 className="text-xl font-bold mb-4 text-black">Your Sustainable Itinerary:</h3>
+          <div className="bg-gray-100 p-6 rounded text-black">
+            <p className="mb-4">{itinerary.overview}</p>
+            {itinerary.days.map((day) => (
+              <div key={day.day} className="mb-4">
+                <h4 className="font-bold text-lg text-green-700">Day {day.day}:</h4>
+                <ul className="list-disc pl-5">
+                  {day.activities.map((activity, index) => (
+                    <li key={index} className="mb-1">{activity}</li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
