@@ -7,72 +7,134 @@ export default function ItineraryForm() {
     destination: '',
     startDate: '',
     endDate: '',
-    preferences: '',
+    duration: '',
+    travelStyle: '',
+    budget: '',
+    interests: '',
+    sustainabilityPreference: '',
   });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission (e.g., send to API, update state, etc.)
-    console.log('Form submitted:', formData);
-  };
+  const [itinerary, setItinerary] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/generate-itinerary', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      setItinerary(data.itinerary);
+    } catch (error) {
+      console.error('Error generating itinerary:', error);
+    }
+    setIsLoading(false);
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 md:p-6 rounded-lg shadow-md">
+    <div className="bg-white p-4 md:p-6 rounded-lg shadow-md">
       <h2 className="text-xl md:text-2xl font-bold mb-4">Create Your Eco-Itinerary</h2>
-      <div className="mb-4">
-        <label htmlFor="destination" className="block mb-2 text-black">Destination</label>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          id="destination"
           name="destination"
           value={formData.destination}
           onChange={handleChange}
-          className="w-full p-2 border rounded text-black" 
-          required
-        />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="startDate" className="block mb-2 text-black">Start Date</label>
-        <input
-          type="date"
-          id="startDate"
-          name="startDate"
-          value={formData.startDate}
-          onChange={handleChange}
+          placeholder="Destination"
           className="w-full p-2 border rounded text-black"
           required
         />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="endDate" className="block mb-2 text-black">End Date</label>
+        <div className="flex space-x-4">
+          <input
+            type="date"
+            name="startDate"
+            value={formData.startDate}
+            onChange={handleChange}
+            className="w-full p-2 border rounded text-black"
+            required
+          />
+          <input
+            type="date"
+            name="endDate"
+            value={formData.endDate}
+            onChange={handleChange}
+            className="w-full p-2 border rounded text-black"
+            required
+          />
+        </div>
         <input
-          type="date"
-          id="endDate"
-          name="endDate"
-          value={formData.endDate}
+          type="number"
+          name="duration"
+          value={formData.duration}
           onChange={handleChange}
+          placeholder="Duration (days)"
           className="w-full p-2 border rounded text-black"
           required
         />
-      </div>
-      <div className="mb-4">
-        <label htmlFor="preferences" className="block mb-2 text-black">Preferences</label>
+        <select
+          name="travelStyle"
+          value={formData.travelStyle}
+          onChange={handleChange}
+          className="w-full p-2 border rounded text-black"
+          required
+        >
+          <option value="">Select Travel Style</option>
+          <option value="adventure">Adventure</option>
+          <option value="relaxation">Relaxation</option>
+          <option value="cultural">Cultural</option>
+          <option value="eco-friendly">Eco-Friendly</option>
+        </select>
+        <input
+          type="text"
+          name="budget"
+          value={formData.budget}
+          onChange={handleChange}
+          placeholder="Budget (e.g., $1000)"
+          className="w-full p-2 border rounded text-black"
+          required
+        />
         <textarea
-          id="preferences"
-          name="preferences"
-          value={formData.preferences}
+          name="interests"
+          value={formData.interests}
+          onChange={handleChange}
+          placeholder="Interests (e.g., hiking, local cuisine, wildlife)"
+          className="w-full p-2 border rounded text-black"
+          rows="3"
+        ></textarea>
+        <select
+          name="sustainabilityPreference"
+          value={formData.sustainabilityPreference}
           onChange={handleChange}
           className="w-full p-2 border rounded text-black"
-          rows="4"
-        ></textarea>
-      </div>
-      <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-full md:w-auto">
-        Generate Itinerary
-      </button>
-    </form>
+          required
+        >
+          <option value="">Sustainability Preference</option>
+          <option value="high">High Priority</option>
+          <option value="medium">Medium Priority</option>
+          <option value="low">Low Priority</option>
+        </select>
+        <button
+          type="submit"
+          className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 w-full"
+          disabled={isLoading}
+        >
+          {isLoading ? 'Generating...' : 'Generate Itinerary'}
+        </button>
+      </form>
+      {itinerary && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold mb-2 text-black">Your Sustainable Itinerary:</h3>
+          <pre className="whitespace-pre-wrap bg-gray-100 p-4 rounded text-black">{itinerary}</pre>
+        </div>
+      )}
+    </div>
   );
 }
