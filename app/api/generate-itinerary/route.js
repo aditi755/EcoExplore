@@ -15,36 +15,57 @@ export async function POST(request) {
     Interests: ${formData.interests}
     Sustainability Preference: ${formData.sustainabilityPreference}
 
-    Please provide a day-by-day itinerary that includes:
-    1. Sustainable accommodations
-    2. Eco-friendly activities and attractions
-    3. Local, sustainable dining options
-    4. Green transportation suggestions
-    5. Tips for minimizing environmental impact
+    Provide a day-by-day itinerary that includes sustainable accommodations, eco-friendly activities, local dining options, and green transportation.
 
-    Format the response as a JSON object with the following structure:
+    Respond ONLY with a JSON object in the following format, without any additional text or explanation:
+
     {
-      "overview": "A brief overview of the trip",
+      "overview": "Brief overview of the trip",
       "days": [
         {
           "day": 1,
           "activities": [
-            "Activity 1",
-            "Activity 2",
-            "Activity 3"
+            "Detailed description of activity 1",
+            "Detailed description of activity 2",
+            "Detailed description of activity 3"
           ]
         },
-        // ... more days
+        {
+          "day": 2,
+          "activities": [
+            "Detailed description of activity 1",
+            "Detailed description of activity 2",
+            "Detailed description of activity 3"
+          ]
+        }
       ]
     }
 
-    Ensure the output is a valid JSON object without any additional text or formatting.`;
+    Ensure the JSON is valid and contains the exact number of days specified in the duration.`;
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const itineraryJson = JSON.parse(response.text());
+    let responseText = response.text();
+
+    // Remove any non-JSON content
+    responseText = responseText.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1');
+
+    // Attempt to parse the JSON
+    let itineraryJson;
+    try {
+      itineraryJson = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Error parsing JSON:', parseError);
+      console.log('Raw response:', responseText);
+      throw new Error('Invalid JSON response from AI model');
+    }
+
+    // Validate the structure of the JSON
+    if (!itineraryJson.overview || !Array.isArray(itineraryJson.days)) {
+      throw new Error('Invalid itinerary structure');
+    }
 
     return new Response(JSON.stringify(itineraryJson), {
       headers: { 'Content-Type': 'application/json' },

@@ -33,6 +33,7 @@ export default function ItineraryForm() {
       });
       const data = await response.json();
       setItinerary(data);
+      console.log(data);
     } catch (error) {
       console.error('Error generating itinerary:', error);
     }
