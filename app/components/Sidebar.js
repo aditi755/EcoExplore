@@ -4,8 +4,8 @@ export default function Sidebar({ activeTab, setActiveTab, isSidebarOpen, setIsS
   const tabs = [
     { name: 'Overview', icon: '📊', id: 'overview' },
     { name: 'Itinerary', icon: '🗺️', id: 'itinerary' },
-    { name: 'Accommodations', icon: '🏨', id: 'accommodations' },
-    { name: 'Transport', icon: '🚆', id: 'transport' },
+    { name: 'Accommodation', icon: '🏨', id: 'accommodation' },
+    { name: 'Transportation', icon: '🚆', id: 'transportation' },
     { name: 'Carbon Footprint', icon: '🌱', id: 'carbon' },
   ];
 

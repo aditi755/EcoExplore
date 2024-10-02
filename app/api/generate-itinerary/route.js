@@ -17,21 +17,13 @@ export async function POST(request) {
 
     Provide a day-by-day itinerary that includes sustainable accommodations, eco-friendly activities, local dining options, and green transportation.
 
-    Respond ONLY with a JSON object in the following format, without any additional text or explanation:
+    IMPORTANT: Respond ONLY with a valid JSON object. Do not include any additional text, explanations, or formatting outside of the JSON structure. The JSON should follow this exact format:
 
     {
       "overview": "Brief overview of the trip",
       "days": [
         {
           "day": 1,
-          "activities": [
-            "Detailed description of activity 1",
-            "Detailed description of activity 2",
-            "Detailed description of activity 3"
-          ]
-        },
-        {
-          "day": 2,
           "activities": [
             "Detailed description of activity 1",
             "Detailed description of activity 2",
@@ -49,17 +41,21 @@ export async function POST(request) {
     const response = await result.response;
     let responseText = response.text();
 
-    // Remove any non-JSON content
-    responseText = responseText.replace(/^[\s\S]*?(\{[\s\S]*\})[\s\S]*$/, '$1');
+    // Log the raw response for debugging
+    console.log('Raw AI response:', responseText);
 
-    // Attempt to parse the JSON
+    // Try to extract JSON from the response
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('No JSON object found in the response');
+    }
+
     let itineraryJson;
     try {
-      itineraryJson = JSON.parse(responseText);
+      itineraryJson = JSON.parse(jsonMatch[0]);
     } catch (parseError) {
       console.error('Error parsing JSON:', parseError);
-      console.log('Raw response:', responseText);
-      throw new Error('Invalid JSON response from AI model');
+      throw new Error('Invalid JSON structure in AI response');
     }
 
     // Validate the structure of the JSON
@@ -73,7 +69,7 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error('Error generating itinerary:', error);
-    return new Response(JSON.stringify({ error: 'Failed to generate itinerary' }), {
+    return new Response(JSON.stringify({ error: error.message || 'Failed to generate itinerary' }), {
       headers: { 'Content-Type': 'application/json' },
       status: 500,
     });

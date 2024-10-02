@@ -6,6 +6,8 @@ import OverviewCards from './OverviewCards';
 import TravelAI from './TravelAI';
 import ItineraryForm from './ItineraryForm';
 import TravelGraph from './TravelGraph';
+import AccommodationAnalysis from './AccommodationAnalysis';
+import TransportationAnalysis from './TransportationAnalysis';
 
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false);
@@ -42,7 +44,8 @@ export default function Dashboard() {
           </>
         )}
         {activeTab === 'itinerary' && <ItineraryForm />}
-        {/* Add more tab content as needed */}
+        {activeTab === 'accommodation' && <AccommodationAnalysis />}
+        {activeTab === 'transportation' && <TransportationAnalysis />}
       </main>
     </div>
   );
