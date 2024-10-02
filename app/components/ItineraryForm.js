@@ -13,8 +13,9 @@ export default function ItineraryForm() {
     interests: '',
     sustainabilityPreference: '',
   });
-  const [itinerary, setItinerary] = useState(null);
+  const [travelPlan, setTravelPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,6 +24,7 @@ export default function ItineraryForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch('/api/generate-itinerary', {
         method: 'POST',
@@ -32,10 +34,14 @@ export default function ItineraryForm() {
         body: JSON.stringify(formData),
       });
       const data = await response.json();
-      setItinerary(data);
-      console.log(data);
+      if (response.ok) {
+        setTravelPlan(data);
+      } else {
+        throw new Error(data.error || 'Failed to generate itinerary');
+      }
     } catch (error) {
       console.error('Error generating itinerary:', error);
+      setError(error.message);
     }
     setIsLoading(false);
   };
@@ -130,22 +136,46 @@ export default function ItineraryForm() {
           {isLoading ? 'Generating...' : 'Generate Itinerary'}
         </button>
       </form>
-      {itinerary && (
+      {error && (
+        <div className="mt-4 p-4 bg-red-100 text-red-700 rounded">
+          Error: {error}
+        </div>
+      )}
+      {travelPlan && (
         <div className="mt-8">
-          <h3 className="text-xl font-bold mb-4 text-black">Your Sustainable Itinerary:</h3>
-          <div className="bg-gray-100 p-6 rounded text-black">
-            <p className="mb-4">{itinerary.overview}</p>
-            {itinerary.days.map((day) => (
-              <div key={day.day} className="mb-4">
-                <h4 className="font-bold text-lg text-green-700">Day {day.day}:</h4>
-                <ul className="list-disc pl-5">
-                  {day.activities.map((activity, index) => (
-                    <li key={index} className="mb-1">{activity}</li>
+          <h3 className="text-xl font-bold mb-4 text-black">Recommended Destinations:</h3>
+          <div className="space-y-4">
+            {travelPlan.recommendations && travelPlan.recommendations.map((rec, index) => (
+              <div key={index} className="bg-gray-100 p-4 rounded">
+                <h4 className="font-bold text-lg text-green-700">{rec.destination}</h4>
+                <p className="mb-2 text-black">{rec.description}</p>
+                <p className="mb-2 text-black">Sustainability Score: {rec.sustainabilityScore}</p>
+                <ul className="list-disc pl-5 text-black">
+                  {rec.activities && rec.activities.map((activity, actIndex) => (
+                    <li key={actIndex}>{activity}</li>
                   ))}
                 </ul>
               </div>
             ))}
           </div>
+          {travelPlan.itinerary && (
+            <>
+              <h3 className="text-xl font-bold my-4 text-black">Your Sustainable Itinerary:</h3>
+              <div className="bg-gray-100 p-6 rounded text-black">
+                <p className="mb-4">{travelPlan.itinerary.overview}</p>
+                {travelPlan.itinerary.days && travelPlan.itinerary.days.map((day) => (
+                  <div key={day.day} className="mb-4">
+                    <h4 className="font-bold text-lg text-green-700">Day {day.day}:</h4>
+                    <ul className="list-disc pl-5">
+                      {day.activities && day.activities.map((activity, index) => (
+                        <li key={index} className="mb-1">{activity}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>
