@@ -1,6 +1,8 @@
 'use client';
 
-export default function Sidebar({ activeTab, setActiveTab, isSidebarOpen, setIsSidebarOpen }) {
+import Link from 'next/link';
+
+export default function Sidebar({ activeTab, isSidebarOpen, setIsSidebarOpen }) {
   const tabs = [
     { name: 'Overview', icon: '📊', id: 'overview' },
     { name: 'Itinerary', icon: '🗺️', id: 'itinerary' },
@@ -25,18 +27,16 @@ export default function Sidebar({ activeTab, setActiveTab, isSidebarOpen, setIsS
       <div className="text-2xl font-bold mb-8">EcoExplore</div>
       <nav>
         {tabs.map((tab) => (
-          <button
+          <Link
             key={tab.id}
-            onClick={() => {
-              setActiveTab(tab.id);
-              setIsSidebarOpen(false);
-            }}
-            className={`w-full text-left py-2 px-4 rounded mb-2 ${
+            href={`/dashboard/${tab.id}`}
+            onClick={() => setIsSidebarOpen(false)}
+            className={`block w-full text-left py-2 px-4 rounded mb-2 ${
               activeTab === tab.id ? 'bg-green-700' : 'hover:bg-green-700'
             }`}
           >
             {tab.icon} {tab.name}
-          </button>
+          </Link>
         ))}
       </nav>
     </aside>

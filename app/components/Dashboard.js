@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Sidebar from './Sidebar';
 import OverviewCards from './OverviewCards';
 import TravelAI from './TravelAI';
@@ -11,8 +12,9 @@ import TransportationAnalysis from './TransportationAnalysis';
 
 export default function Dashboard() {
   const [isClient, setIsClient] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname();
+  const activeTab = pathname.split('/').pop() || 'overview';
 
   useEffect(() => {
     setIsClient(true);
@@ -24,7 +26,6 @@ export default function Dashboard() {
     <div className="flex flex-col md:flex-row h-screen bg-gray-100">
       <Sidebar 
         activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
