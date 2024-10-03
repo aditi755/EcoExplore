@@ -2,14 +2,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import AccommodationForm from './AccommodationForm';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'];
 
 export default function AccommodationAnalysis() {
   const [accommodations, setAccommodations] = useState([]);
   const [analysis, setAnalysis] = useState(null);
 
   useEffect(() => {
-    // Load accommodations from localStorage on component mount
     const storedAccommodations = localStorage.getItem('accommodations');
     if (storedAccommodations) {
       setAccommodations(JSON.parse(storedAccommodations));
@@ -23,7 +22,7 @@ export default function AccommodationAnalysis() {
     }
 
     const totalNights = accommodations.reduce((sum, acc) => sum + acc.nights, 0);
-    const accommodationTypes = ['Eco-lodge', 'Green Hotel', 'Sustainable Guesthouse', 'Other'];
+    const accommodationTypes = ['Eco-lodge', 'Green Hotel', 'Sustainable Guesthouse', 'Hostel', 'Hotel', 'Other'];
     const data = accommodationTypes.map(type => ({
       name: type,
       value: accommodations
@@ -32,7 +31,7 @@ export default function AccommodationAnalysis() {
     }));
 
     const sustainableNights = data
-      .filter(item => item.name !== 'Other')
+      .filter(item => ['Eco-lodge', 'Green Hotel', 'Sustainable Guesthouse'].includes(item.name))
       .reduce((sum, item) => sum + item.value, 0);
     const sustainabilityScore = (sustainableNights / totalNights) * 100;
 
@@ -45,7 +44,6 @@ export default function AccommodationAnalysis() {
 
   useEffect(() => {
     analyzeAccommodations();
-    // Save accommodations to localStorage whenever they change
     localStorage.setItem('accommodations', JSON.stringify(accommodations));
   }, [accommodations, analyzeAccommodations]);
 
@@ -53,10 +51,21 @@ export default function AccommodationAnalysis() {
     setAccommodations(prevAccommodations => [...prevAccommodations, newAccommodation]);
   };
 
+  const handleSearch = async (type, location, nights) => {
+    // This is where you would call your backend API
+    // For now, we'll simulate an API call with dummy data
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
+    return [
+      { name: "Green Paradise Hotel", address: "123 Eco St, Green City" },
+      { name: "Sustainable Stay Inn", address: "456 Nature Ave, Eco Town" },
+      { name: "Eco Friendly Lodge", address: "789 Earth Blvd, Greenville" },
+    ];
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-black">Accommodation Analysis</h2>
-      <AccommodationForm onSubmit={handleAddAccommodation} />
+      <AccommodationForm onSubmit={handleAddAccommodation} onSearch={handleSearch} />
       {analysis ? (
         <>
           <p className="mb-4 text-black">
