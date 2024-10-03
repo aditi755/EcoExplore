@@ -27,6 +27,7 @@ export default function Sidebar({ activeTab, isSidebarOpen, setIsSidebarOpen }) 
       <div className="text-2xl font-bold mb-8">EcoExplore</div>
       <nav>
         {tabs.map((tab) => (
+          //lINK TAG OF NEXT.JS TO ROUTE IT TO /DASHBOARD/[ID]
           <Link
             key={tab.id}
             href={`/dashboard/${tab.id}`}
