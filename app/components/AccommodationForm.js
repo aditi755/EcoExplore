@@ -1,10 +1,12 @@
 import { useState } from 'react';
 
-export default function AccommodationForm({ onSubmit, onSearch }) {
+export default function AccommodationForm({ onSubmit }) {
   const [accommodationType, setAccommodationType] = useState('');
   const [location, setLocation] = useState('');
   const [nights, setNights] = useState(1);
   const [searchResults, setSearchResults] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -14,11 +16,20 @@ export default function AccommodationForm({ onSubmit, onSearch }) {
 
   const handleSearch = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
     try {
-      const results = await onSearch(accommodationType, location, nights);
+      const response = await fetch(`/api/accommodations?type=${accommodationType}&location=${location}&nights=${nights}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch accommodations');
+      }
+      const results = await response.json();
       setSearchResults(results);
     } catch (error) {
       console.error('Error searching accommodations:', error);
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -64,11 +75,17 @@ export default function AccommodationForm({ onSubmit, onSearch }) {
             placeholder="Number of nights"
             required
           />
-          <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
-            Search Accommodations
+          <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600" disabled={isLoading}>
+            {isLoading ? 'Searching...' : 'Search Accommodations'}
           </button>
         </div>
       </form>
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded">
+          Error: {error}
+        </div>
+      )}
 
       {searchResults.length > 0 && (
         <div className="mb-4">

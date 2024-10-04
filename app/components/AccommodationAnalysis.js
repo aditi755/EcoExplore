@@ -51,21 +51,10 @@ export default function AccommodationAnalysis() {
     setAccommodations(prevAccommodations => [...prevAccommodations, newAccommodation]);
   };
 
-  const handleSearch = async (type, location, nights) => {
-    // This is where you would call your backend API
-    // For now, we'll simulate an API call with dummy data
-    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API delay
-    return [
-      { name: "Green Paradise Hotel", address: "123 Eco St, Green City" },
-      { name: "Sustainable Stay Inn", address: "456 Nature Ave, Eco Town" },
-      { name: "Eco Friendly Lodge", address: "789 Earth Blvd, Greenville" },
-    ];
-  };
-
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-black">Accommodation Analysis</h2>
-      <AccommodationForm onSubmit={handleAddAccommodation} onSearch={handleSearch} />
+      <h2 className="text-2xl font-bold mb-4 text-black">Accommodation Finder and Analysis</h2>
+      <AccommodationForm onSubmit={handleAddAccommodation} />
       {analysis ? (
         <>
           <p className="mb-4 text-black">
